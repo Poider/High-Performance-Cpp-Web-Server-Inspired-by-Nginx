@@ -11,6 +11,7 @@ class ListClients
 	private:
 		std::vector<Client> _clients;
 	public:
+	ListClients(){};
 		int	getClient(SOCKET clientSocket) const
 		{
 			for (int i = 0; i < _clients.size(); i++)

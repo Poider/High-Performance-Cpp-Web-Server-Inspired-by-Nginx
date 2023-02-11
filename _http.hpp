@@ -19,7 +19,7 @@ struct Http{
             _writes(writes), _clients(clients), _server(server)
     {};
 
-    void getRequest(int Client_Number, const ServerMap& SameSocketServers)
+    void getRequest(int Client_Number, ServerMap& SameSocketServers)
     {
 		Client &client = _clients[Client_Number];
 		memset(client.request, 0 , BUFFER_SIZE);
@@ -53,7 +53,24 @@ struct Http{
 				client.requestHandler->parseRequestHeader(header);
 				//set server config
 					//loop through servers and add server configs of the matched one from the request in the client 
-				client.set_request_configs(SameSocketServers);
+				ServerConfigs *requestConfigs;
+				{
+					A_Request::headersType headers = client.requestHandler->getHeaders();
+					std::string host = headers.at("Host")[0];
+
+					requestConfigs = &((SameSocketServers.begin())->second.getServerConfigs());
+					for (auto &serv : SameSocketServers)
+					{
+						if (host == serv.first)
+						{
+							requestConfigs = &(serv.second.getServerConfigs());
+							break;
+						}
+					}
+				}
+				client.set_request_configs(requestConfigs);
+
+
 				
 				std::string &path = client.requestHandler->getPath();
 				client.path  = new char[path.length() + 1];

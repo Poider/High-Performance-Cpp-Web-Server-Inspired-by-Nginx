@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:06:20 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/11 13:57:56 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/11 17:09:17 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,11 +48,16 @@ class Client
 		
 		bool isRequestHeaderDone() const;
 
+		ServerConfigs &getRequestConfigs()
+		{
+			return (*requestConfigs);
+		}
+
 		const char *get_address(); //return address client as string
 		void set_error_code(int errorCode);
 
 		void factoryRequestHandlerSetter();
-		void set_request_configs(const ServerMap&	SameSocketServers);
+void set_request_configs(ServerConfigs	*requestConfigs_);
 };
 
 #endif

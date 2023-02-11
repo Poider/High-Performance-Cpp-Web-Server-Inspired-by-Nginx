@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:49:29 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/11 15:54:55 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/11 17:29:35 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,6 @@ class Server
 				if (url[url.length() - 1] != '/')
 					url += "/";
 				url += entry->d_name;
-				std::cout << url << std::endl;
 				fileContent += "<li><a href=" + url  + ">" + entry->d_name +   "</a></li><br>";
 				entry = readdir(dir);
 			}
@@ -248,7 +247,7 @@ class Server
 		
 		void setPathError(Client &client, std::string &path)
 		{
-			path = getServerConfigs().getErrorPage(client.responseCode);
+			path = client.getRequestConfigs().getErrorPage(client.responseCode);
 			client.fp = fopen(path.c_str(), "rb");
 		}
 
@@ -257,7 +256,8 @@ class Server
 		{
 			std::string path = client.path;
 			
-			Location &bestLocationMatched = getBestMatchedLocation(_serverConfigs.getLocations(), client.path);
+			ServerConfigs serverConfig = client.getRequestConfigs();
+			Location &bestLocationMatched = getBestMatchedLocation(serverConfig.getLocations(), client.path);
 			std::cout << "request Path = " << path << " bestLocation : " << bestLocationMatched.getRoute() << " isErrorHappend = " << client.sendError << std::endl;
 			if (!client.sendError)
 			{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   StatusCode.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 11:19:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/09 15:08:25 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/11 17:13:24 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ enum StatusCode
 	BAD_REQUEST = 400,
 	METHOD_NOT_ALLOWED = 405,
 	INTERNAL_SERVER_ERROR = 500,
-	OK = 200
+	OK = 200,
 };
 
 

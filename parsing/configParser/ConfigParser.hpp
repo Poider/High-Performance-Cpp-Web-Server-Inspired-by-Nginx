@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/01 12:56:24 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/10 15:32:35 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/11 17:50:52 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -293,6 +293,13 @@ class ConfigParser
 				std::string nextToken = getNextToken();
 				if (bracketStack.empty())
 				{
+					if (nextToken.empty())
+					{
+						if (servers.empty())
+							pErrorParsing("File is Empty!");
+						else
+							continue;
+					}
 					if (nextToken == "server")
 					{
 

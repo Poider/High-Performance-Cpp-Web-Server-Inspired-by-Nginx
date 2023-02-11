@@ -20,7 +20,7 @@ class Client;
 
 class A_Request
 {
-	private:
+	protected:
 		std::string 											_path;
 		std::string 											_method;
 		std::string												_httpVersion;

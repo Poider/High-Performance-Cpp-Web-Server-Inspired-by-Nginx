@@ -1,6 +1,6 @@
 NAME = webserv
 
-SRCS = main.cpp HostsManagement.cpp
+SRCS = main.cpp HostsManagement.cpp  GetRequest.cpp client.cpp
 
 OBJS = ${SRCS:.c=.o}
 

@@ -6,12 +6,23 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 16:34:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/07 18:57:51 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/11 13:56:17 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "webserv.hpp"
+
+std::vector<std::map <std::string, int > > StaticConfig::SERVER_CONFIGS = StaticConfig::MakeServerConfigVector();
+
+std::map < int  , std::string> StaticErrorPages::ERROR_PAGES = StaticErrorPages::S_InitErrorPages();
+
+
+std::map <std::string, std::string > ContentTypes::S_CONTENT_TYPES_MAPPING =  ContentTypes::S_setContentTypesMapping();
+std::map <std::string, std::string > ContentTypes::S_EXTENTIONS_MAPPING =  ContentTypes::S_setExtentionsMapping();
+
+
+std::map <std::string, bool> SupportedMethods::SUPPORTED_METHODS =  SupportedMethods::S_SetSupportedMethods();
 
 
 std::string readFile(std::string file)
@@ -23,7 +34,6 @@ std::string readFile(std::string file)
 	std::string serverConfigs = "";
 	if ( myfile.is_open() ) 
 	{
-
 		std::string sa;
         while (getline(myfile, sa))
 		
@@ -68,21 +78,20 @@ int main(int ac , char **av)
 			}
 			for (auto &xs : servers)
 			{
-				for (auto &ser : xs.second)
+				// first server with that ip + port of different host_names
+				auto &ser = *(xs.second.begin()); 
+				Server &server = ser.second;//getting server from the map
+				ListClients &clients = server.getClients();
+				ft::Http http(reads, writes, clients, server);
+				if (FD_ISSET(server.getSocket(), &readyReads))
+					server.addClient(maxSocketSoFar, reads, writes);
+				for (int i = 0; i < clients.getNumberClient(); i++)
 				{
-					Server &server  = ser.second;
-					ListClients &clients = server.getClients();
-					ft::Http http(reads, writes, clients,server);
-					if (FD_ISSET(server.getSocket(), &readyReads))
-						server.addClient(maxSocketSoFar, reads, writes);
-					for (int i = 0; i < clients.getNumberClient(); i++)
-					{
-						int sizeClient = clients.getNumberClient();
-						if (FD_ISSET(clients[i].socket, &readyReads))
-							http.getRequest(i);
-						if (i >= 0  && FD_ISSET(clients[i].socket, &readyWrites) && clients[i].path)
-							http.sendResponse(i);
-					}	
+					int sizeClient = clients.getNumberClient();
+					if (FD_ISSET(clients[i].socket, &readyReads))
+						http.getRequest(i,xs.second);
+					if (i >= 0 && FD_ISSET(clients[i].socket, &readyWrites) && clients[i].path)
+						http.sendResponse(i);
 				}
 			}
 		}

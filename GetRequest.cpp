@@ -1,21 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.cpp                                           :+:      :+:    :+:   */
+/*   GetRequest.cpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/01 16:56:49 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/10 16:30:18 by klaarous         ###   ########.fr       */
+/*   Created: 2023/02/09 12:42:18 by klaarous          #+#    #+#             */
+/*   Updated: 2023/02/10 15:11:55 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <ctime>
+#include "GetRequest.hpp"
+#include "client.hpp"
 
-int main(int ac, char **av)
+void GetRequest::handleRequest(std::string &body, Client &client)
 {
-	
+	if (!body.empty())
+	{
+		client.set_error_code(BAD_REQUEST);
+	}
+}
 
-	return (0);
+GetRequest::~GetRequest()
+{
+
 }

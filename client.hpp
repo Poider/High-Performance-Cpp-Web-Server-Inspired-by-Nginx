@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:06:20 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/07 17:33:05 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/11 13:57:56 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,15 @@
 #define CLIENT_HPP
 
 #include "includes.hpp"
-#include "StatusCode.hpp"
+#include "static/StatusCode.hpp"
+#include "GetRequest.hpp"
+#include "PostRequest.hpp"
+// #include "server.hpp"
 
+class A_Request; 
+class ServerConfigs;
+class Server;
+#define ServerMap std::map<std::string, Server >
 
 class Client
 {
@@ -27,42 +34,25 @@ class Client
 		char request[MAX_REQUEST_SIZE + 1];
 		char *path;
 		FILE *fp;
-		int 	received;
-		int 	responseCode;
-		bool	sendError;
-	
-	Client()
-	{
-		received = 0;
-		address_length = sizeof(address);
-		socket = -1;
-		path  = nullptr;
-		fp = nullptr;
-		responseCode = OK;
-		sendError = false;
-	}
-	Client(SOCKET socket)
-	{
-		received = 0;
-		address_length = sizeof(address);
-		path  = nullptr;
-		fp = nullptr;
-		this->socket = socket;
-		responseCode = OK;
-		sendError = false;
-	}
+		int 		received;
+		int 		responseCode;
+		bool		sendError;
+		A_Request   *requestHandler;
+		bool		requestHeaderDone;
+		ServerConfigs	*requestConfigs;// reset if we reset request?
 
-	const char *get_address() //return address client as string
-		{
-			getnameinfo((struct sockaddr*)&address,
-					address_length,
-					address_buffer, sizeof(address_buffer), 0, 0,
-					NI_NUMERICHOST);
-			return (address_buffer);
-		}
-	
-	
-	
+
+		Client();
+		
+		Client(SOCKET socket);
+		
+		bool isRequestHeaderDone() const;
+
+		const char *get_address(); //return address client as string
+		void set_error_code(int errorCode);
+
+		void factoryRequestHandlerSetter();
+		void set_request_configs(const ServerMap&	SameSocketServers);
 };
 
 #endif

@@ -7,9 +7,13 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <ctime>
+#include <sstream>
+#include <dirent.h>
 
 
 
@@ -37,7 +41,7 @@
 #include <fstream>
 
 
-#define MAX_REQUEST_SIZE 2047
+#define MAX_REQUEST_SIZE 4096
 #define BUFFER_SIZE		 2048
 
 #endif

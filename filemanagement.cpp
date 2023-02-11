@@ -1,21 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.cpp                                           :+:      :+:    :+:   */
+/*   filemanagement.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/02/01 16:56:49 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/10 16:30:18 by klaarous         ###   ########.fr       */
+/*   Created: 2023/02/10 15:28:23 by mel-amma          #+#    #+#             */
+/*   Updated: 2023/02/10 15:29:05 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <iostream>
-#include <ctime>
+#include "filesystem.hpp"
 
-int main(int ac, char **av)
+bool delete_file()
 {
-	
 
-	return (0);
+}
+
+bool delete_directory()
+{
+    
 }

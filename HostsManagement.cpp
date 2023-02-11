@@ -3,19 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   HostsManagement.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/07 18:44:42 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/07 18:44:45 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/09 12:13:29 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 
-#include "server.hpp"
-#include "parsing/configParser/ConfigParser.hpp"
-#include "StatusCode.hpp"
-#include "_http.hpp"
+#include "webserv.hpp"
 
 void closeHosts(std::map<std::string, ServerMap > &servers)
 {
@@ -49,8 +46,8 @@ bool CreateHostSockets(std::map<std::string, ServerMap >& servers, SOCKET &maxSo
 		catch (const std::exception &e)
 		{
 			closeHosts(servers);
-			return (0);
+			return (false);
 		}
 	}
-	return 1;
+	return (true);
 }

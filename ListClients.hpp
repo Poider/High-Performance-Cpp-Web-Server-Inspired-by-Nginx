@@ -4,6 +4,8 @@
 
 #include "client.hpp"
 
+class Client;
+
 class ListClients
 {
 	private:

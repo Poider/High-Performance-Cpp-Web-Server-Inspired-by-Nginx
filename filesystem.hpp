@@ -3,7 +3,8 @@
 
 //default var// enumeration
 
-
+#include <ios>
+#include <fstream>
 
 enum Mode {
     READ,
@@ -89,6 +90,12 @@ public:
         }
         return (fileContents);
     };
+
+    void Write_chunk(char* content, int size)  {
+        if (file.is_open()) {
+            file.write(content,size);
+        }
+    }
 
     void Write(const std::string& contents)  {
         if (file.is_open()) {

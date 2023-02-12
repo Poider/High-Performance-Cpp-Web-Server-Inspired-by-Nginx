@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 14:37:58 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/12 16:54:18 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 17:21:28 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,9 @@ class PostRequest : public  A_Request
 			else
 			{
 				received += body.size();
-				//fs.Write(body);
+				fs.Write(body);
 			}
 			
-				// std::cout << body.size() << " "<<  received << " " << body_length << std::endl;
 			if(body_length <= received)
 			{
 				std::cout << "finished" << std::endl;

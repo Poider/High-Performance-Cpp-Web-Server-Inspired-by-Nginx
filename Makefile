@@ -4,7 +4,7 @@ SRCS = main.cpp HostsManagement.cpp  GetRequest.cpp client.cpp
 
 OBJS = ${SRCS:.c=.o}
 
-CC = c++
+CC = c++ -fsanitize=address
 
 RM = rm -f
 

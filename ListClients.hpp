@@ -36,6 +36,7 @@ class ListClients
 
 		void dropClient(int &clientIdx, fd_set &reads, fd_set &writes)
 		{
+			std::cout << "dropping client " << clientIdx << std::endl;
 			SOCKET clientSocket = _clients[clientIdx].socket;
 			FD_CLR(clientSocket, &reads);
 			FD_CLR(clientSocket, &writes);

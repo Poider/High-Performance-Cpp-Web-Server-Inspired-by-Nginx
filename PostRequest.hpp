@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 14:37:58 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/11 18:44:00 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 16:54:18 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,24 +24,55 @@ class PostRequest : public  A_Request
 	int received;
 	bool file_initialized;
 	int body_length;
+	bool is_chunked;
 	public :
 		PostRequest()
 		{
-			std::vector < std::string > content_type_vector = _headers.at("Content-Length");
-			std::string content_len = content_type_vector[0];
-			body_length = std::stoi(content_len);
-			received = 0;
 			file_initialized = false;
-		}
+			is_chunked = false;
+		};
 		
-		void handleRequest(std::string &body, Client &client)
+		void post_init()
 		{
+			auto it = _headers.find("Content-Length");
+			if(it != _headers.end())
+			{
+				std::vector < std::string > content_type_vector = it->second;
+				std::string content_len = content_type_vector[0];
+				body_length = std::stoi(content_len);
+			}
+			else
+			{
+				body_length = 0;
+				is_chunked = true;
+			}
+			received = 0;
+			file_initialized = true;
+		}
+
+		void handleRequest(std::string &body, Client &client,bool &body_done)
+		{
+			// std::cout << "handling body"  << body.size()<< std::endl;
 			//open file where to 
+
+			auto it = _headers.find("Content-Type");
+			if(it == _headers.end())
+			{
+				//case no body
+				body_done= true;
+				return ;
+			}
+
+			if(!file_initialized)
+				post_init();
+			
 			std::vector < std::string > content_type_vector = _headers.at("Content-Type");
 			std::string content_type = content_type_vector[0];
-			if(!file_initialized)
+			if(!file_initialized && content_type != "multipart/form-data")
 			{
-				fs = FileSystem(_path/*get best match*/, WRITE, ContentTypes::getExtention(content_type));
+				std::string str("./public/uploads/upload_");
+				//upload_store check if its there, check upload pass or just put in default upload path
+				fs = FileSystem(str/*get best match*/, WRITE, ContentTypes::getExtention(content_type));
 				fs.open();
 				file_initialized = true;
 			}
@@ -61,25 +92,19 @@ class PostRequest : public  A_Request
 			else
 			{
 				received += body.size();
-				fs.Write(body);
+				//fs.Write(body);
 			}
-	
-			if(body_length >= received)
+			
+				// std::cout << body.size() << " "<<  received << " " << body_length << std::endl;
+			if(body_length <= received)
 			{
+				std::cout << "finished" << std::endl;
 				fs.close();
 				//flag up body is done to either close connection or reset the whole request
+				body_done = true;
 			}
 		};
 
-		void handle_length_upload(std::string &body, Client &client)
-		{
-
-		}
-
-		void handle_chunked_upload(std::string &body, Client &client)
-		{
-
-		}
 
 		~PostRequest()
 		{

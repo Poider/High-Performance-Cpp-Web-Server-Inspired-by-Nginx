@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 12:38:10 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/11 17:00:50 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 16:09:57 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Client::Client()
 	sendError = false;
 	requestHeaderDone = false;
 	requestHandler = nullptr;
+	body_done = false;
 }
 
 
@@ -37,6 +38,7 @@ Client::Client(SOCKET socket)
 	sendError = false;
 	requestHeaderDone = false;
 	requestHandler = nullptr;
+	body_done = false;
 }
 
 

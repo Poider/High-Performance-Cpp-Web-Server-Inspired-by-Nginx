@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:06:20 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/11 17:09:17 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 16:14:08 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class Client
 		A_Request   *requestHandler;
 		bool		requestHeaderDone;
 		ServerConfigs	*requestConfigs;// reset if we reset request?
+		bool body_done;
 
 
 		Client();

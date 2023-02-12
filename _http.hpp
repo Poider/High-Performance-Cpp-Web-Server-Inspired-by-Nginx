@@ -24,18 +24,18 @@ struct Http{
 		// std::cout <<"getRequest\n";
 		Client &client = _clients[Client_Number];
 		memset(client.request, 0 , BUFFER_SIZE);
-		int sz = recv(client.socket, client.request , BUFFER_SIZE, 0);
+		size_t sz = recv(client.socket, client.request , BUFFER_SIZE, 0);
 		if (sz < 1)
 		{
 			printf("Unexpected disconnect from %d.\n",
 				client.socket);
 			_clients.dropClient(Client_Number, _reads, _writes);
 		}
-		std::cout << "size Read = " << sz << std::endl;
+		// std::cout << "size Read = " << sz << std::endl;
 		client.request[sz] = 0;
-		std::cout << strlen(client.request)<< std::endl;
+		// std::cout << strlen(client.request)<< std::endl;
 		
-		std::string body = client.request;
+		std::string body(client.request,sz);
 		if  (!client.isRequestHeaderDone())
 		{
 			client.received += sz;
@@ -48,7 +48,8 @@ struct Http{
 				return;
 			}
 			std::string header = body.substr(0, pos);
-			body = body.substr(std::min(pos + 4, body.length()), body.length());
+			body = body.substr(std::min(pos + 4, sz), sz);
+			sz = sz - pos;
 			if (client.requestHandler == nullptr)
 				client.factoryRequestHandlerSetter();
 			// parse request
@@ -79,9 +80,8 @@ struct Http{
 		}
 		if (client.requestHandler)
 		{
-			std::cout << "hi" << std::endl;
-			client.requestHandler->handleRequest(body, client,client.body_done);
-			if(client.body_done)
+			client.requestHandler->handleRequest(body, sz, client);
+			if(client.body_is_done())
 				std::cout << "body_done " << std::endl;
 		}
     };
@@ -108,8 +108,13 @@ struct Http{
     };
 
     private :
+		void substr_size(std::string& str, size_t pos ,size_t size)
+		{
+			
+		}
 
 
+		//deprecated
         void get_request_done(int Client_Number)
         {
 			Client &client = _clients[Client_Number];

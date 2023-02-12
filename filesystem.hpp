@@ -91,9 +91,9 @@ public:
         return (fileContents);
     };
 
-    void Write_chunk(char* content, int size)  {
+    void Write_chunk(std::string& content, size_t size)  {
         if (file.is_open()) {
-            file.write(content,size);
+            file.write(content.data(),size);
         }
     }
 

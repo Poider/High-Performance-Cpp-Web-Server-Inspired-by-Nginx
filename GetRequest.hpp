@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 14:37:58 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/12 16:14:20 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 18:15:17 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 class GetRequest : public  A_Request
 {
 	public :
-		void handleRequest(std::string &body, Client &client, bool& body_done);
+		void handleRequest(std::string &body, size_t size, Client &client);
 		~GetRequest();
 };
 

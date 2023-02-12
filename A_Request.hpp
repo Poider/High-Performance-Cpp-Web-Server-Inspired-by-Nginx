@@ -77,7 +77,7 @@ public:
 		return (_headers);
 	}
 
-	virtual void handleRequest(std::string &body, Client &client,bool & body_done) = 0;
+	virtual void handleRequest(std::string &body, size_t size,Client &client) = 0;
 	
 	virtual ~A_Request()
 	{

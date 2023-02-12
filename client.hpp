@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:06:20 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/12 16:14:08 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 18:15:33 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,9 @@ class Client
 		void set_error_code(int errorCode);
 
 		void factoryRequestHandlerSetter();
-void set_request_configs(ServerConfigs	*requestConfigs_);
+		void set_request_configs(ServerConfigs	*requestConfigs_);
+		void finished_body();
+		bool body_is_done();
 };
 
 #endif

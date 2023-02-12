@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/09 12:38:10 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/12 16:09:57 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/12 18:15:36 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,3 +83,12 @@ void Client::set_request_configs(ServerConfigs	*requestConfigs_)
 	requestConfigs = requestConfigs_;
 };
 
+void Client::finished_body()
+{
+	body_done = true;
+};
+
+bool Client::body_is_done()
+{
+	return body_done;
+}

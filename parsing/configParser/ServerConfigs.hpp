@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfigs.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:17:55 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/10 15:27:03 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/14 16:06:13 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,24 @@ class ServerConfigs
 				_errorPages[errorCode] = path;
 				file.close();
 			}
+		}
+
+		Location &getBestMatchedLocation(std::string &path)
+		{
+			int idxBestLocation = 0;
+			int maxLenMatched = 1;
+			for (int i = _locations.size() - 1 ; i > 0; i--)
+			{
+				if (_locations[i].isRouteMatch(path))
+				{
+					if (_locations[i].getRoute().length() >= maxLenMatched)
+					{
+						maxLenMatched = _locations[i].getRoute().length();
+						idxBestLocation = i;
+					}
+				}
+			}
+			return (_locations[idxBestLocation]);
 		}
 		
 };

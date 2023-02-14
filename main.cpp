@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 16:34:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/12 17:56:18 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/13 16:48:52 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,8 @@ int main(int ac , char **av)
 					int sizeClient = clients.getNumberClient();
 					if (FD_ISSET(clients[i].socket, &readyReads))
 						http.getRequest(i,xs.second);
-					if (i >= 0 && FD_ISSET(clients[i].socket, &readyWrites) && clients[i].path && clients[i].body_is_done())
+					if (i >= 0 && FD_ISSET(clients[i].socket, &readyWrites) && clients[i].body_is_done())
 					{
-						std::cout << "here\n";
 						http.sendResponse(i);
 					}
 				}

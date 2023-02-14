@@ -1,24 +1,8 @@
-Creating socket...
-Binding socket to local address...
-Listening...
-New connection from 7.
-chunk = Le massacre de Nemmersdorf est un massacre de civils allemands survenu entre le 21 et le 23 octobre 1944 dans le village, alors allemand, de Nemmersdorf en Prusse orientale (aujourd'hui Maïakovskoïe, en Russie). Au cours de ce massacre, l'Armée rouge tue entre 20 et 30 personnes après la prise de cette localité. Les victimes de Nemmersdorf ne sont pas toutes tuées au même moment ou au même endroit dans le village : le terme de « massacre » désigne en réalité une succession d'événements distincts.
+a06
+Le massacre de Nemmersdorf est un massacre de civils allemands survenu entre le 21 et le 23 octobre 1944 dans le village, alors allemand, de Nemmersdorf en Prusse orientale (aujourd'hui Maïakovskoïe, en Russie). Au cours de ce massacre, l'Armée rouge tue entre 20 et 30 personnes après la prise de cette localité. Les victimes de Nemmersdorf ne sont pas toutes tuées au même moment ou au même endroit dans le village : le terme de « massacre » désigne en réalité une succession d'événements distincts.
 Capturé par les Soviétiques le 21 octobre 1944, le village de Nemmersdorf est repris dans la nuit du 23 octobre par les Allemands, qui découvrent des exactions commises par l'Armée rouge sur les civils. Rapidement, les autorités militaires allemandes enquêtent sur ces événements, et le ministère de l'Éducation du peuple et de la Propagande du Reich s'en empare pour faire sa propagande. Le massacre de Nemmersdorf sert notamment à présenter les soldats soviétiques comme cruels et barbares, dans le but de galvaniser la résistance allemande. Cet objectif n'est toutefois pas atteint puisque c'est la peur des Allemands qui s'en trouve renforcée, ce qui engendre plus tard dans la guerre des réactions de panique face à l'avancée des troupes soviétiques, comme lors des suicides de Demmin.
-Après la fin de la guerre, l'instrumentalisation des événements de Nemmersdorf se poursuit. En effet, la République fédérale d'Allemagne érige ces crimes de guerre en symbole de ce que la population d'Allemagne de l'Est est alors sous occupation soviétique. Les descriptions héritées de la propagande nazie sont encore amplifiées dans un contexte de guerre froide. De l'autre côté du rideau de fer, la réalité du massacre de Nemmersdorf est nié
-created File
-openedd
-chunk = e, et ces événements sont surtout présentés comme une opération de propagande nazie.
+Après la fin de la guerre, l'instrumentalisation des événements de Nemmersdorf se poursuit. En effet, la République fédérale d'Allemagne érige ces crimes de guerre en symbole de ce que la population d'Allemagne de l'Est est alors sous occupation soviétique. Les descriptions héritées de la propagande nazie sont encore amplifiées dans un contexte de guerre froide. De l'autre côté du rideau de fer, la réalité du massacre de Nemmersdorf est niée, et ces événements sont surtout présentés comme une opération de propagande nazie.
 Avec la fin de la guerre froide et l'étude plus neutre des crimes de guerres subis par le peuple allemand dans les derniers mois de la Seconde Guerre mondiale, l'historiographie du massacre de Nemmersdorf est devenue plus apaisée. Les travaux de Bernhard Fisch au tournant des années 2000, particulièrement, permirent une réévaluation de ces événements. En Allemagne, le massacre de Nemmersdorf est encore emblématique des violences infligées par l'Armée rouge, au même titre que les bombardements de villes comme Dresde ou Hambourg sont emblématiques des violences infligées par les Alliés occidentaux.akdakkdkadkadkakkdkkakkadkdakakdkkkadaldalldladda
 adkadkadkkdakdawkadwk
+0
 
-body_done 
-sending response
-request Path = / bestLocation : / isErrorHappend = 1
-HTTP/1.1 201  Created 
-Connection: close
-Content-Length: 262
-Content-Type: text/html
-
-
-sending response
-dropping client 0

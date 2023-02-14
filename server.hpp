@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:49:29 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/12 16:14:49 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/14 16:09:42 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,22 +99,9 @@ class Server
 			}
 		}
 
-		Location &getBestMatchedLocation(std::vector <Location> &locations, std::string path)
+		Location &getBestMatchedLocation(std::string path)
 		{
-			int idxBestLocation = 0;
-			int maxLenMatched = 1;
-			for (int i = locations.size() - 1 ; i > 0; i--)
-			{
-				if (locations[i].isRouteMatch(path))
-				{
-					if (locations[i].getRoute().length() >= maxLenMatched)
-					{
-						maxLenMatched = locations[i].getRoute().length();
-						idxBestLocation = i;
-					}
-				}
-			}
-			return (locations[idxBestLocation]);
+			return (_serverConfigs.getBestMatchedLocation(path));
 		}
 		
 		std::string getPathRessource(Location &bestLocationMatched, std::string path)
@@ -231,6 +218,10 @@ class Server
 				headerRespone += "  Bad Request ";
 			else if (client.responseCode == NOT_FOUND)
 				headerRespone += "  Not Found ";
+			else if (client.responseCode == OK)
+				headerRespone += "  OK ";
+			else if (client.responseCode == CREATED)
+				headerRespone += "  Created ";
 			else if (client.responseCode == METHOD_NOT_ALLOWED)
 			{
 				headerRespone += "  Method Not Allowed\r\nAllow: ";
@@ -257,7 +248,7 @@ class Server
 			std::string path = client.path;
 			
 			ServerConfigs serverConfig = client.getRequestConfigs();
-			Location &bestLocationMatched = getBestMatchedLocation(serverConfig.getLocations(), client.path);
+			Location &bestLocationMatched =  getBestMatchedLocation( client.path);
 			std::cout << "request Path = " << path << " bestLocation : " << bestLocationMatched.getRoute() << " isErrorHappend = " << client.sendError << std::endl;
 			if (!client.sendError)
 			{

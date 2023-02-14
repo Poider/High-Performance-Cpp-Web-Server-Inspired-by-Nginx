@@ -31,7 +31,7 @@ struct Http{
 				client.socket);
 			_clients.dropClient(Client_Number, _reads, _writes);
 		}
-		// std::cout << "size Read = " << sz << std::endl;
+		//std::cout << "size Read = " << sz << std::endl;
 		client.request[sz] = 0;
 		// std::cout << strlen(client.request)<< std::endl;
 		
@@ -49,7 +49,7 @@ struct Http{
 			}
 			std::string header = body.substr(0, pos);
 			body = body.substr(std::min(pos + 4, sz), sz);
-			sz = sz - pos;
+			sz = sz - std::min(pos + 4, sz);
 			if (client.requestHandler == nullptr)
 				client.factoryRequestHandlerSetter();
 			// parse request

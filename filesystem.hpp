@@ -48,8 +48,9 @@ public:
                 file.open(path, std::ios::in | std::ios::binary);
                 break;
             case (WRITE):
-                path = path + generateRandomString(4) + extension;
+                path = path + generateRandomString(15) + extension;
                 file.open(path, std::ios::out | std::ios::trunc | std::ios::binary);
+				std::cout << "openedd\n";
                 break;
             case (APPEND):
                 file.open(path, std::ios::out | std::ios::app | std::ios::binary);

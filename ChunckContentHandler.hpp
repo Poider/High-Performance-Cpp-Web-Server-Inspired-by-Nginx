@@ -20,7 +20,7 @@
 class ChunkContentHandler{
 private:
 	static const unsigned int	maxBuffer = 20;
-	unsigned int				expectedContentSize;
+	unsigned long 				expectedContentSize;
 	char						nbBuffer[maxBuffer];
 	bool						done;
 
@@ -66,36 +66,28 @@ public:
 		while (chunkSize--){
 			if (expectedContentSize == 0)
 			{
-				if (arr.size() % 2 == 1)
-				{
+				if (arr.size() % 2 == 1){
 					arr.push_back(chunk);
 				}
 				if (i == maxBuffer){
 					std::memset(nbBuffer, 0, maxBuffer);
 					return (false);
 				}
-				//std::cout  << "buffer = "  << nbBuffer << " currVal = " << *chunk << std::endl;
 				nbBuffer[i] = *chunk;
-				if (i >= 1 && !std::strncmp(nbBuffer + (i - 1), "\r\n", 2))
-				{
-					
-					i = 0;
+				if (i >= 1 && !std::strncmp(nbBuffer + (i - 1), "\r\n", 2)){
 					if (!_setExpectedContentSize())
 						return (false);
-					//std::cout << "expected  = "  << expectedContentSize << std::endl;
-					if (expectedContentSize == 2)
-					{
-						//std::cout << "done here\n";
+					if (expectedContentSize == 2){
 						done = true;
 						break;
 					}
-					//std::cout  << "buffer = "  << nbBuffer << std::endl;
+					i = 0;
 					std::memset(nbBuffer, 0, maxBuffer);
-				} 
+				}
 				else
 					i++;
-			} 
-			else 
+			}
+			else
 			{
 				if (arr.size() % 2 == 0)
 					arr.push_back(chunk);
@@ -108,6 +100,41 @@ public:
 		return (true);
 	}
 
+public:
+
+	//TODO: remove (just for test)
+	//file should contain CRLF
+	static void testFunction(const std::string& filePath){
+		std::vector<std::string> contentResult;
+		std::ifstream file (filePath);
+		char buffer[1001];
+		ChunkContentHandler clientChunk;
+		int chunkedSize[] = {16, 2, 5, 3, 2, 5};
+		int nbChunks = sizeof(chunkedSize) / sizeof(int);
+		int counter = 0;
+		while (counter < nbChunks){
+			file.read(buffer, chunkedSize[counter]);
+			std::vector<const char *> res;
+			bool clientResult = clientChunk.getHttpChunkContent(buffer, file.gcount(), res);
+			std::cout << (clientResult ? "true" : "false") << std::endl;
+			if (!clientResult)
+				break;
+			int i = 0;
+			while (i < res.size()){
+				contentResult.push_back(std::string(res[i], res[i + 1]));
+				i+=2;
+			}
+			std::cout << "Is Done: " << (clientChunk.is_done() ? "true" : "false") << std::endl;
+			if (clientChunk.is_done())
+				break;
+			counter++;
+		}
+		std::cout << "Content: " << std::endl;
+		for (std::vector<std::string>::iterator iter = contentResult.begin(); iter != contentResult.end(); iter++){
+			std::cout << *iter;
+		}
+	}
+
 private:
 
 	bool _setExpectedContentSize(){
@@ -115,18 +142,18 @@ private:
 
 		while (_isHexChar(nbBuffer[i]))
 			i++;
-		//std::cout << " i = " << i << std::endl;
 		if (nbBuffer[i] != '\r' || nbBuffer[i + 1] != '\n')
 		{
-			//std::cout << "aaaaa\n";
 			return (false);
 		}
 		nbBuffer[i] = 0;
 		try{
-			expectedContentSize = std::stoul(nbBuffer, NULL, 16) + 2;
-			//std::cout << "nb: " << expectedContentSize << std::endl;
+			expectedContentSize = std::stoul(nbBuffer, NULL, 16);
+			if (expectedContentSize > 0xFFFFFFFFFFFFFFFDul){
+				return (false);
+			}
+			expectedContentSize += 2;
 		}catch (std::exception &e){
-			//std::cout << "heree\n";
 			return (false);
 		}
 		return (true);

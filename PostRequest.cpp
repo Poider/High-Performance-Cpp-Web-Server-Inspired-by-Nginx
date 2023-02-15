@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/14 16:11:03 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/15 14:53:09 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,12 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         // std::cout << body;
         if(!chunk_handler.getHttpChunkContent(body.c_str(),size,chunks))
         {
-            std::cout << "chunkde failed\n";
+            std::cout << "chunks parsing failed\n";
             client.set_error_code(BAD_REQUEST);
             client.finished_body();
             return ;
         }
-        //std::cout << "chunk size = " << chunks.size() << std::endl;
+        std::cout << "chunk size = " << chunks.size() << std::endl;
         for (int i = 0; i < chunks.size(); i +=2)
         {
             const char *a =  chunks[i];
@@ -120,8 +120,7 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
             file_initialized = true;
         }
         //maybe clean of \n\r and such?
-        received += size;
-        fs.Write_chunk(body,size);
+        is_chunked? write_body(chunks,size): write_body(body,size) ;
     }
     if (!is_chunked && body_length <= received)
     {
@@ -134,6 +133,24 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         client.finished_body();
     }
 };
+
+
+void PostRequest::write_body(std::string& body, size_t size)
+{
+    received += size;
+    fs.Write_chunk(body,size);
+}
+
+void PostRequest::write_body(std::vector<const char *>  &chunks, size_t size)
+{
+    for (int i = 0; i < chunks.size(); i +=2)
+    {
+        const char *a =  chunks[i];
+        int _size = chunks[i + 1] - chunks[i];
+        fs.Write_chunk(a,_size);
+    }
+};
+
 
 PostRequest::~PostRequest()
 {

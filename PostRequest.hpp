@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 14:37:58 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/14 16:55:12 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/15 15:05:48 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include "static/ContentTypes.hpp"
 #include "ChunckContentHandler.hpp"
 #include <cstring>
+#include "BoundaryHandler.hpp"
+
 
 class PostRequest : public  A_Request
 {
@@ -28,6 +30,7 @@ class PostRequest : public  A_Request
 	int 		body_length;
 	bool 		is_chunked;
 	ChunkContentHandler chunk_handler;
+	BoundaryHandler boundary_handler;
 
 	public :
 		PostRequest();

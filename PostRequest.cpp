@@ -6,12 +6,13 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/15 14:53:09 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/15 17:12:18 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PostRequest.hpp"
 #include "ChunckContentHandler.hpp"
+#include "BoundaryHandler.hpp"
 
 PostRequest::PostRequest()
 {
@@ -107,6 +108,20 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         // take care content-type or content_disposition with their boundaries having boundary set somewhere
 
         // fs.close(); then make a new file when theres a new one
+    
+        if(boundary_handler.is_initialized())
+        {
+             auto it = _headers.find("boundary");
+            if (it != _headers.end())
+            {
+                std::cout << "boundary doesnt exist error\n";
+                client.set_error_code(BAD_REQUEST);
+                client.finished_body();
+                return ;
+            }
+            boundary_handler.set_boundary(it->second[0],&fs);
+        }
+    
     }
     else
     {

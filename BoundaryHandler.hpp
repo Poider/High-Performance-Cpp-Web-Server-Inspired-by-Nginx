@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   boundaryHandler.hpp                                :+:      :+:    :+:   */
+/*   BoundaryHandler.hpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:48:13 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/15 18:23:35 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/16 18:39:24 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 #define EXTRA_BOUNDARY
 #include <map>
 #include <cstring>
+#include <vector>
 #include <iostream>
 #include <utility>
 #include "filesystem.hpp"
@@ -24,28 +25,41 @@
 
 //test substr size andd test join with past null string
 
+enum STAGE{
+    IN_BODY,
+    NEED_CONTENT_TYPE
+};
+
 struct BoundaryHandler{
 
 FileSystem 	*fs;
 std::string extra;
-size_t extra_len;//boundry max is 70
+STAGE stage;
 bool initialized;
 std::string boundary;
+bool done;
+//vector of pairs of what to write + (content-type)OrEmpty to add on last file opened
+typedef std::vector<std::pair<std::string, std::string> > BoundaryRetType;
 
-//map of what to (write+size) + (content-type)OrEmpty to add on last file opened
-typedef std::map<std::pair<std::string, size_t>, std::string> BoundaryRetType;
 
 BoundaryHandler();
 BoundaryRetType clean_body(std::string &body, size_t size);
 void set_boundary(std::string& boundary, FileSystem *fs);
 bool is_initialized();
-bool clean_boundary(std::string &str, size_t &size, BoundaryRetType &res);//clean body from boundary
+bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::string &before_boundary);//clean body from boundary
 std::string parse_mini_header(std::string &body, size_t size);
-void fill_extra(std::string &str, size_t size);//split string, saves extra, returns what to be written
-
+std::string get_content_type(std::string &body, size_t size);
+size_t find_boundary_start(std::string &body);
+size_t find_boundary_end(std::string &body,size_t start);
+bool is_done();
 ~BoundaryHandler();
 
-    
+void fill_extra(std::string &str, size_t pos);//split string, saves extra, returns what to be written
+void join_up_receives(std::string &body);
+
+private :
+size_t findSubstring(const std::string& str, const std::string& substr);
+
 };
 
 

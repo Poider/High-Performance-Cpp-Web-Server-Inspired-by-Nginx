@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 16:34:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/13 16:48:52 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/16 16:08:35 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,15 @@ std::string readFile(std::string file)
 
 
 
+std::map<std::string, ServerMap > servers;
+
+void handler(int sig){
+	if (sig == SIGINT){
+		printf("Closing Server\n");
+		closeHosts(servers);
+		exit(0);
+	}
+}
 
 int main(int ac , char **av)
 {
@@ -54,11 +63,12 @@ int main(int ac , char **av)
 		std::cerr << "number argument Not valid !" << std::endl;
 		return (0);
 	}
+	signal(SIGINT, handler);
 	std::ifstream myfile (av[1]);
 	ConfigParser parser = ConfigParser(readFile(av[1]));
 	
 	//map<host+ip , <map <server name,server>>>
-	std::map<std::string, ServerMap > servers;
+	
 	SOCKET maxSocketSoFar = -1;
 	fd_set reads , writes, readyReads, readyWrites;
 

@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/17 18:38:56 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/17 18:53:03 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ BoundaryHandler::BoundaryHandler()
 
 
 //if returned map size is 0 then just go again till next iteration
-//change map to vector
+//stop when is_done()
 BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, size_t size)
 {
     BoundaryRetType res;
@@ -70,8 +70,9 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
             size_t s = body.size();
             if(clean_boundary(body,s,before_boundary))
             {
-                insert_raw(res,before_boundary,empty_content);
+                insert_raw(res,before_boundary,contentType);
                 fill_extra(body, BEFORE_CONTENT_TYPE);
+                body.clear();
                 //so it handles all boundaries properly in one call
                 BoundaryRetType sec_result = clean_body(body,body.size());
                 for(size_t i = 0; i < sec_result.size(); i++)

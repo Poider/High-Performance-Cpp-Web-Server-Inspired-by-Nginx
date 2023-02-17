@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:48:13 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/16 18:39:24 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/17 16:45:32 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,12 @@
 #include <iostream>
 #include <utility>
 #include "filesystem.hpp"
+#include "parsing/requestParser/HeaderParser.hpp"
 
 
 //test substr size andd test join with past null string
+#define BEFORE_CONTENT_TYPE 0 
+#define EXTRA100 1 
 
 enum STAGE{
     IN_BODY,
@@ -32,9 +35,9 @@ enum STAGE{
 
 struct BoundaryHandler{
 
-FileSystem 	*fs;
 std::string extra;
 STAGE stage;
+bool first_boundary;
 bool initialized;
 std::string boundary;
 bool done;
@@ -44,19 +47,21 @@ typedef std::vector<std::pair<std::string, std::string> > BoundaryRetType;
 
 BoundaryHandler();
 BoundaryRetType clean_body(std::string &body, size_t size);
-void set_boundary(std::string& boundary, FileSystem *fs);
+void set_boundary(std::string& boundary);
 bool is_initialized();
-bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::string &before_boundary);//clean body from boundary
+bool clean_boundary(std::string &body, size_t &size, std::string &before_boundary);//clean body from boundary
 std::string parse_mini_header(std::string &body, size_t size);
-std::string get_content_type(std::string &body, size_t size);
+std::string get_content_type(std::string &body, size_t size, size_t &header_end_found);
 size_t find_boundary_start(std::string &body);
 size_t find_boundary_end(std::string &body,size_t start);
 bool is_done();
+void insert_raw(BoundaryRetType& res ,std::string& raw,std::string& contentType);
+
 ~BoundaryHandler();
 
-void fill_extra(std::string &str, size_t pos);//split string, saves extra, returns what to be written
+void fill_extra(std::string &str, bool Type);//split string, saves extra, returns what to be written
 void join_up_receives(std::string &body);
-
+std::string& get_extra();
 private :
 size_t findSubstring(const std::string& str, const std::string& substr);
 

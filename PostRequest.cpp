@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/15 17:12:18 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/17 18:44:55 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
                 client.finished_body();
                 return ;
             }
-            boundary_handler.set_boundary(it->second[0],&fs);
+            boundary_handler.set_boundary(it->second[0]);
         }
     
     }

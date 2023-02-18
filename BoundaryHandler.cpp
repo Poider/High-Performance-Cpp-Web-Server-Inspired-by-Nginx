@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/17 18:53:03 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/17 18:54:56 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,9 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
             fill_extra(body,BEFORE_CONTENT_TYPE);//k (saving whats in body rn(whats after boundary)
         }
         else
-        {//->we found content type and we have it (we may have before boundary and we are   after miniheader in "body" and stage INBODY)     
+        {//->we found content type and we have it (we may have before boundary and we are   after miniheader in "body" and stage INBODY)
+        
+        //!!make sure this all is good and test
             insert_raw(res,before_boundary,empty_content);
             size_t s = body.size();
             if(clean_boundary(body,s,before_boundary))

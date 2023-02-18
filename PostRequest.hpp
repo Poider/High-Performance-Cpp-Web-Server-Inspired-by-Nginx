@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 14:37:58 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/15 15:05:48 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/18 13:48:02 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +18,8 @@
 #include "client.hpp"
 #include "static/ContentTypes.hpp"
 #include "ChunckContentHandler.hpp"
-#include <cstring>
 #include "BoundaryHandler.hpp"
-
+#include <cstring>
 
 class PostRequest : public  A_Request
 {
@@ -40,6 +39,9 @@ class PostRequest : public  A_Request
 		
 
 		void handleRequest(std::string &body, size_t size, Client &client);
+		
+		void setBodyAsFinished(Client &client);
+		void open_file(std::string& contentType);
 
 		void write_body(std::string& body, size_t size);
 		void write_body(std::vector<const char *>  &chunks, size_t size);
@@ -49,4 +51,3 @@ class PostRequest : public  A_Request
 
 
 #endif
-

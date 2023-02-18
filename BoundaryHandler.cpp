@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/17 18:54:56 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/18 17:20:20 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,15 @@ size_t BoundaryHandler::findSubstring(const std::string& str, const std::string&
     const char* substrData = substr.data();
     size_t strLength = str.length();
     size_t substrLength = substr.length();
+    std::cout << "->"<< substr << " HEREE" << std::endl;
 
     for (size_t i = 0; i <= strLength - substrLength; i++)
     {
-        if (memcmp(strData + i, substrData, substrLength) == 0)
+        size_t len = std::min(substrLength, strLength - i);
+        if (memcmp(strData + i, substrData, len) == 0)
+        {
             return i;
+        }
     }
 
     return std::string::npos;
@@ -49,13 +53,13 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
     bool boundary_found;
     std::string empty_content = "";
     join_up_receives(body);
-    if(stage = IN_BODY)
+    
+    if(stage == IN_BODY)
     {
         boundary_found = clean_boundary(body,size,before_boundary);//first before_boundary throw away
     }
     if(stage == NEED_CONTENT_TYPE)
     { 
-        std::string contentType;
         
         //if boundary found//
         std::string contentType = parse_mini_header(body,size);//returns new contentType -> set it in the map
@@ -92,7 +96,8 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
     {
         fill_extra(body,EXTRA100);
         insert_raw(res,body,empty_content);
-    }  
+    }
+    
     return res;
 };
 
@@ -100,6 +105,7 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
 //if boundary found -> body= purified body after the boundary end
 bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::string &before_boundary)
 {
+
     size_t pos = find_boundary_start(body);
     if(pos == std::string::npos || pos + boundary.size() + 2 > body.size())//(so boundary ends with \r\n or --)
         return 0;
@@ -107,6 +113,7 @@ bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::strin
     //clean body from boundary// store whats before boundary
     before_boundary = body.substr(0,pos);
     size_t after_boundary_pos;
+    std::cout << "stint" <<std::endl;
     after_boundary_pos = find_boundary_end(body,pos);
     if(after_boundary_pos == std::string::npos)
     {
@@ -114,12 +121,16 @@ bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::strin
         done = true;
         return 0;
     }
+    std::cout << "inn\n";
+
     if(!done)
     {
         body = body.substr(after_boundary_pos, size);
         size = body.size();
         // put it in the vector?
     }
+    std::cout << "innt\n";
+
     return 1;
 }
 
@@ -228,6 +239,7 @@ void BoundaryHandler::fill_extra(std::string &str, bool type)
 void BoundaryHandler::set_boundary(std::string& boundary)
 {
     this->boundary = "--"+boundary;
+    initialized = true;
 };
 
 size_t BoundaryHandler::find_boundary_start(std::string &body)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerConfigs.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:17:55 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/14 16:06:13 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/15 17:40:00 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ class ServerConfigs
 		std::string					_host;
 		std::string					_serv;
 		std::string 				_serverName;
-		unsigned int				_maxClientBodySize;
+		unsigned long  long			_maxClientBodySize;
 		std::map<int , std::string> _errorPages;
 		std::vector <Location> 		_locations;
 	public :
@@ -68,7 +68,7 @@ class ServerConfigs
 			return (_listen);
 		}
 
-		unsigned int &getMaxClientBodySize()
+		unsigned long long &getMaxClientBodySize()
 		{
 			return (_maxClientBodySize);
 		}
@@ -146,7 +146,7 @@ class ServerConfigs
 			_serverName = serverName;
 		}
 
-		void setMaxClientBodySize(unsigned int maxClientBodySize)
+		void setMaxClientBodySize(unsigned long long maxClientBodySize)
 		{
 			_maxClientBodySize = maxClientBodySize;
 		}

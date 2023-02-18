@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 16:34:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/16 16:08:35 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/15 12:45:36 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,9 @@ std::map <std::string, std::string > ContentTypes::S_EXTENTIONS_MAPPING =  Conte
 
 
 std::map <std::string, bool> SupportedMethods::SUPPORTED_METHODS =  SupportedMethods::S_SetSupportedMethods();
+
+
+std::map < int  , std::string> StaticResponseMessages::MAPPING_RESPONSE_CODE_TO_MESSAGES = StaticResponseMessages::S_initResponseMessages();
 
 
 std::string readFile(std::string file)
@@ -45,15 +48,6 @@ std::string readFile(std::string file)
 
 
 
-std::map<std::string, ServerMap > servers;
-
-void handler(int sig){
-	if (sig == SIGINT){
-		printf("Closing Server\n");
-		closeHosts(servers);
-		exit(0);
-	}
-}
 
 int main(int ac , char **av)
 {
@@ -63,12 +57,11 @@ int main(int ac , char **av)
 		std::cerr << "number argument Not valid !" << std::endl;
 		return (0);
 	}
-	signal(SIGINT, handler);
 	std::ifstream myfile (av[1]);
 	ConfigParser parser = ConfigParser(readFile(av[1]));
 	
 	//map<host+ip , <map <server name,server>>>
-	
+	std::map<std::string, ServerMap > servers;
 	SOCKET maxSocketSoFar = -1;
 	fd_set reads , writes, readyReads, readyWrites;
 

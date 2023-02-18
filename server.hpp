@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 15:49:29 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/14 16:09:42 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/15 17:01:23 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 
 #include "includes.hpp"
 #include "static/ContentTypes.hpp"
+#include "static/StaticResponseMessages.hpp"
 #include "ListClients.hpp"
 
 class Server
@@ -127,7 +128,7 @@ class Server
 			
 			DIR* dir = opendir(path.c_str());
 			if (dir == NULL) {
-				client.set_error_code(NOT_FOUND);
+				client.set_response_code(NOT_FOUND);
 				return ;
 			}
 			std::string fileName = genereteRandomName() + ".html";
@@ -184,10 +185,15 @@ class Server
 							}
 						}
 					}
-					if (bestLocation.getAutoIndex())
+					if (!client.fp)
 					{
+						if (!bestLocation.getAutoIndex())
+						{
+							client.set_response_code(FORBIDDEN);
+							return ;
+						}
 						listDirectoyIntoFile(client, path);
-					}
+					}	
 				}
 				else if( s.st_mode & S_IFREG )
 				{
@@ -214,23 +220,16 @@ class Server
 			rewind(client.fp);
 			std::string extention = getExtention(path);
 			std::string contentType =  ContentTypes::getContentType(extention);
-			if (client.responseCode == BAD_REQUEST)
-				headerRespone += "  Bad Request ";
-			else if (client.responseCode == NOT_FOUND)
-				headerRespone += "  Not Found ";
-			else if (client.responseCode == OK)
-				headerRespone += "  OK ";
-			else if (client.responseCode == CREATED)
-				headerRespone += "  Created ";
-			else if (client.responseCode == METHOD_NOT_ALLOWED)
+			headerRespone += StaticResponseMessages::getMessageResponseCode(client.responseCode);
+			if (client.responseCode == METHOD_NOT_ALLOWED)
 			{
-				headerRespone += "  Method Not Allowed\r\nAllow: ";
+				headerRespone += "\r\nAllow: ";
 				std::map <std::string , bool > allowedMethod =  bestLocation.getAllowMethods();
 				for (auto xs : allowedMethod)
 					headerRespone += xs.first + ", ";
 			}
-			else
-				headerRespone += " OK ";
+			else if (client.responseCode == MOVED_PERMANETLY)
+				headerRespone += "\r\nlocation: " + bestLocation.getRedirect();
 			headerRespone += "\r\nConnection: close\r\nContent-Length: " + std::to_string(fileSize) +  "\r\nContent-Type: " + contentType + "\r\n\r\n";
 
 			return (headerRespone);
@@ -246,16 +245,15 @@ class Server
 		bool sendHeaderResponse(Client &client, fd_set &reads, fd_set &writes, int &clientIdx)
 		{
 			std::string path = client.path;
-			
 			ServerConfigs serverConfig = client.getRequestConfigs();
-			Location &bestLocationMatched =  getBestMatchedLocation( client.path);
+			Location &bestLocationMatched =  getBestMatchedLocation(client.path);
 			std::cout << "request Path = " << path << " bestLocation : " << bestLocationMatched.getRoute() << " isErrorHappend = " << client.sendError << std::endl;
 			if (!client.sendError)
 			{
 				if (bestLocationMatched.isMethodAllowed(client.requestHandler->getMethod()))
 					tryOpenRessource( path, client, bestLocationMatched);
 				else
-					client.set_error_code(METHOD_NOT_ALLOWED);
+					client.set_response_code(METHOD_NOT_ALLOWED);
 			}
 			if (client.fp == nullptr)
 				setPathError(client, path);

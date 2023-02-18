@@ -6,13 +6,12 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/17 18:44:55 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/18 17:15:17 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "PostRequest.hpp"
 #include "ChunckContentHandler.hpp"
-#include "BoundaryHandler.hpp"
 
 PostRequest::PostRequest()
 {
@@ -46,6 +45,16 @@ bool PostRequest::post_init()
 }
 
 
+void PostRequest::open_file(std::string &contentType)
+{
+    std::string str("./public/uploads/upload_");
+	std::cout << "created File\n";
+	// upload_store check if its there, check upload pass or just put in default upload path
+	fs = FileSystem(str /*get best match*/, WRITE, ContentTypes::getExtention(contentType));
+	fs.open();
+    file_initialized = true;
+}
+
 /*  send in the buffer itself or its address and the size to write  */
 void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
 {
@@ -65,7 +74,7 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
     {  
         if(!post_init())
         {
-            client.set_error_code(BAD_REQUEST);
+            client.set_response_code(BAD_REQUEST);
             client.finished_body();
             return ;
         }
@@ -78,7 +87,7 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         if(!chunk_handler.getHttpChunkContent(body.c_str(),size,chunks))
         {
             std::cout << "chunks parsing failed\n";
-            client.set_error_code(BAD_REQUEST);
+            client.set_response_code(BAD_REQUEST);
             client.finished_body();
             return ;
         }
@@ -103,49 +112,64 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         if chunk size is 0 meaning its done then  close and flag up its done with body
     */
 
+    //handle this with chunks
     if (content_type == "multipart/form-data")
     {
         // take care content-type or content_disposition with their boundaries having boundary set somewhere
 
         // fs.close(); then make a new file when theres a new one
-    
-        if(boundary_handler.is_initialized())
+        if(!boundary_handler.is_initialized())
         {
-             auto it = _headers.find("boundary");
-            if (it != _headers.end())
+            auto it = _headers.find("boundary");
+            if (it == _headers.end())
             {
                 std::cout << "boundary doesnt exist error\n";
-                client.set_error_code(BAD_REQUEST);
+                client.set_response_code(BAD_REQUEST);
                 client.finished_body();
                 return ;
             }
             boundary_handler.set_boundary(it->second[0]);
         }
-    
+        std::cout << "hi" << std::endl;
+        BoundaryHandler::BoundaryRetType res = boundary_handler.clean_body(body,body.size());
+        std::cout << "hi2" << std::endl;
+        
+        for(size_t i = 0; i < body.size(); i++)
+        {
+            if(!res[i].second.empty())
+            {
+                if(fs.is_open())
+                    fs.close();
+                // fs.set_extension(ContentTypes::getExtention(res[i].second));
+                open_file(ContentTypes::getExtention(res[i].second));
+            }
+            if(fs.is_open())
+                write_body(res[i].first,res[i].first.size());
+            else
+            {
+                std::cout << res[i].first << std::endl;
+                std::cout << "what just happened?" << std::endl;
+            }
+            std::cout << "___" + res[i].first+ "____" << std::endl;
+        }
+
     }
     else
     {
         if(!file_initialized)
-        {
-            std::string str("./public/uploads/upload_");
-	        std::cout << "created File\n";
-	        // upload_store check if its there, check upload pass or just put in default upload path
-	        fs = FileSystem(str /*get best match*/, WRITE, ContentTypes::getExtention(content_type));
-	        fs.open();
-            file_initialized = true;
-        }
+            open_file(content_type);
         //maybe clean of \n\r and such?
         is_chunked? write_body(chunks,size): write_body(body,size) ;
     }
     if (!is_chunked && body_length <= received)
     {
         fs.close();
-        client.finished_body();
+        setBodyAsFinished(client);
     }
     else if (is_chunked && chunk_handler.is_done())
     {
         fs.close();
-        client.finished_body();
+        setBodyAsFinished(client);
     }
 };
 
@@ -169,4 +193,10 @@ void PostRequest::write_body(std::vector<const char *>  &chunks, size_t size)
 
 PostRequest::~PostRequest()
 {
+}
+
+void PostRequest::setBodyAsFinished(Client &client)
+{
+	client.finished_body();
+	client.set_response_code(CREATED);
 }

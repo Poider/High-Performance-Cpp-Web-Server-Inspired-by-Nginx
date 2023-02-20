@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 16:34:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/15 12:45:36 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/20 18:11:22 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ std::string readFile(std::string file)
 
 int main(int ac , char **av)
 {
-
+	std::srand(std::time(nullptr));
 	if (ac != 2)
 	{
 		std::cerr << "number argument Not valid !" << std::endl;

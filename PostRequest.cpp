@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/20 15:37:00 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/20 18:29:03 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void PostRequest::open_file(std::string &contentType)
 void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
 {
 	//size is what received read
+    // std::cout << body << std::endl;
     auto it = _headers.find("Content-Type");
     if (it == _headers.end())
     {
@@ -79,7 +80,7 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
             return ;
         }
     }
-
+    
     std::vector<const char *>  chunks;
     if(is_chunked)
     {
@@ -115,53 +116,23 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
     //handle this with chunks
     if (content_type == "multipart/form-data")
     {
-        // take care content-type or content_disposition with their boundaries having boundary set somewhere
+        if(is_chunked)
+        {
+            for (int i = 0; i < chunks.size(); i +=2)
+            {
+                std::string chunk_body(chunks[i],chunks[i + 1]- chunks[i]);
+                handle_boundary(chunk_body,size,client);
+            }
 
-        // fs.close(); then make a new file when theres a new one
-        if(!boundary_handler.is_initialized())
-        {
-            auto it = _headers.find("boundary");
-            if (it == _headers.end())
-            {
-                std::cout << "boundary doesnt exist error\n";
-                client.set_response_code(BAD_REQUEST);
-                client.finished_body();
-                return ;
-            }
-            boundary_handler.set_boundary(it->second[0]);
         }
-        BoundaryHandler::BoundaryRetType res = boundary_handler.clean_body(body,body.size());
-        
-        if(res.size() != 0)
-        {
-            for(size_t i = 0; i < res.size(); i++)
-            {
-                if(!res[i].second.empty())
-                {
-                    if(fs.is_open())
-                        fs.close();
-                    open_file(res[i].second);
-                }
-                if(fs.is_open())
-                {
-                    write_body(res[i].first,res[i].first.size());
-                    // received += res[i].first.size();
-                }   
-                else
-                {
-                    std::cout <<"?"<< res[i].first << "?";
-                    std::cout << "what just happened?" << std::endl;
-                }
-                std::cout << "___" + res[i].first+ "____" << std::endl;
-            }
-        }
+        else
+            handle_boundary(body,size,client);
 
     }
     else
     {
         if(!file_initialized)
             open_file(content_type);
-        //maybe clean of \n\r and such?
         is_chunked? write_body(chunks,size): write_body(body,size) ;
     }
     if (!is_chunked && (body_length <= received || boundary_handler.is_done()))
@@ -202,4 +173,49 @@ void PostRequest::setBodyAsFinished(Client &client)
 {
 	client.finished_body();
 	client.set_response_code(CREATED);
+}
+
+void PostRequest::handle_boundary(std::string &body, size_t size, Client &client)
+{
+    if(!boundary_handler.is_initialized())
+        {
+            auto it = _headers.find("boundary");
+            if (it == _headers.end())
+            {
+                std::cout << "boundary doesnt exist error\n";
+                client.set_response_code(BAD_REQUEST);
+                client.finished_body();
+                return ;
+            }
+            boundary_handler.set_boundary(it->second[0]);
+        }
+        BoundaryHandler::BoundaryRetType res = boundary_handler.clean_body(body,body.size());
+        
+        if(res.size() != 0)
+        {
+            for(size_t i = 0; i < res.size(); i++)
+            {
+                if(res[i].first.empty() && res[i].second.empty())
+                {
+                    std::cout << "contiuin" << std::endl;
+                    continue;
+                }
+                if(!res[i].second.empty())
+                {
+                    if(fs.is_open())
+                        fs.close();
+                    open_file(res[i].second);
+                }
+                if(fs.is_open())
+                {
+                    write_body(res[i].first,res[i].first.size());
+                    // received += res[i].first.size();
+                }   
+                else
+                {
+                    std::cout <<"?"<< res[i].first << "?";
+                    std::cout << "what just happened?" << std::endl;
+                }
+            }
+        }
 }

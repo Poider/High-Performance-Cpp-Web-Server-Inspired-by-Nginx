@@ -27,7 +27,6 @@ class FileSystem{
         result.reserve(length);
         static const char alphanum[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-        std::srand(std::time(nullptr));
         for (int i = 0; i < length; ++i)
         {
             result.push_back(alphanum[std::rand() % (sizeof(alphanum) - 1)]);

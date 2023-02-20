@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/20 14:53:56 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/20 17:21:05 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,15 +58,7 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
     {
         boundary_found = clean_boundary(body,size,before_boundary);//first before_boundary throw away
     }
-    // std::cout << "after  cleaning :" << before_boundary << std::endl;
-
-    // if(stage == NEED_CONTENT_TYPE)
-    // {
-    //     std::cout << before_boundary << std::endl;
-    //     std::cout << "need content type" << std::endl;
-    // }
-    // std::cout << "after  cleaning boundary :" << body << std::endl<< "!!!" <<std::endl;
-    // std::cout << "__________" << std::endl;
+    
     if(stage == NEED_CONTENT_TYPE)
     { 
         
@@ -131,17 +123,12 @@ bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::strin
         done = true;
         return 0;
     }
-    std::cout << "start :" << pos << std::endl;
-    std::cout << "before_boundary :" << before_boundary <<"!!"<< std::endl<<"!!!" << std::endl;
-
-    std::cout << "BEFORE cleaned boundary here and in content type:" <<std::endl << body << std::endl;
 
     if(!done)
     {
         body = body.substr(after_boundary_pos, size);
         size = body.size();
     }
-    std::cout << "cleaned boundary here and in content type:" <<std::endl << body << std::endl;
     return 1;
 }
 
@@ -157,7 +144,10 @@ size_t BoundaryHandler::find_boundary_end(std::string &body,size_t start)
             return cursor + 2;
         if(cursor - start > 6 && memcmp(strData + cursor, "--", 2) == 0)//to not take firsts ones
         {
+            
             std::cout << "last boundary found" << std::endl;
+            std::cout << body<<std::endl;
+
             done = true;
             return cursor + 2;
         }
@@ -173,17 +163,15 @@ std::string BoundaryHandler::parse_mini_header(std::string &body, size_t size)
     std::string contentType = get_content_type(body,size,header_end_found);
     if(header_end_found == std::string::npos)
     {
-        std::cout <<"header npos" << std::endl;
+        // std::cout <<"header npos" << std::endl;
         stage = NEED_CONTENT_TYPE;
         return(std::string());
     }
     if(contentType.empty())//case only contentDisposition
         contentType = "text/plain";
-        
-    //if I find contentType
-    //update body to point to after(start of body)
+    
+
     stage = IN_BODY;
-    std::cout << "before  miniheader sb:" << body << std::endl<< "!!!" <<std::endl;
     body = body.substr(header_end_found + 4 ,body.length());
 
     return contentType;

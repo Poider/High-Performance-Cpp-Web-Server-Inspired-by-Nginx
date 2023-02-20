@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/18 17:15:17 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/20 15:37:00 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,27 +130,30 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
             }
             boundary_handler.set_boundary(it->second[0]);
         }
-        std::cout << "hi" << std::endl;
         BoundaryHandler::BoundaryRetType res = boundary_handler.clean_body(body,body.size());
-        std::cout << "hi2" << std::endl;
         
-        for(size_t i = 0; i < body.size(); i++)
+        if(res.size() != 0)
         {
-            if(!res[i].second.empty())
+            for(size_t i = 0; i < res.size(); i++)
             {
+                if(!res[i].second.empty())
+                {
+                    if(fs.is_open())
+                        fs.close();
+                    open_file(res[i].second);
+                }
                 if(fs.is_open())
-                    fs.close();
-                // fs.set_extension(ContentTypes::getExtention(res[i].second));
-                open_file(ContentTypes::getExtention(res[i].second));
+                {
+                    write_body(res[i].first,res[i].first.size());
+                    // received += res[i].first.size();
+                }   
+                else
+                {
+                    std::cout <<"?"<< res[i].first << "?";
+                    std::cout << "what just happened?" << std::endl;
+                }
+                std::cout << "___" + res[i].first+ "____" << std::endl;
             }
-            if(fs.is_open())
-                write_body(res[i].first,res[i].first.size());
-            else
-            {
-                std::cout << res[i].first << std::endl;
-                std::cout << "what just happened?" << std::endl;
-            }
-            std::cout << "___" + res[i].first+ "____" << std::endl;
         }
 
     }
@@ -161,7 +164,7 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         //maybe clean of \n\r and such?
         is_chunked? write_body(chunks,size): write_body(body,size) ;
     }
-    if (!is_chunked && body_length <= received)
+    if (!is_chunked && (body_length <= received || boundary_handler.is_done()))
     {
         fs.close();
         setBodyAsFinished(client);

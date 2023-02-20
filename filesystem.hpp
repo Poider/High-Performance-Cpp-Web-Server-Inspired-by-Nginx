@@ -48,7 +48,7 @@ public:
                 file.open(path, std::ios::in | std::ios::binary);
                 break;
             case (WRITE):
-                path = path + generateRandomString(15) + extension;
+                path = path + generateRandomString(4) + extension;
                 file.open(path, std::ios::out | std::ios::trunc | std::ios::binary);
 				std::cout << "openedd\n";
                 break;
@@ -65,6 +65,7 @@ public:
     }
     void close()
     {
+        std::cout << "closed a file\n";
         file.close();
     }
 

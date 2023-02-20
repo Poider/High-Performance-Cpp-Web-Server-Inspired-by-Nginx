@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/18 17:20:20 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/20 14:53:56 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ size_t BoundaryHandler::findSubstring(const std::string& str, const std::string&
     const char* substrData = substr.data();
     size_t strLength = str.length();
     size_t substrLength = substr.length();
-    std::cout << "->"<< substr << " HEREE" << std::endl;
 
     for (size_t i = 0; i <= strLength - substrLength; i++)
     {
@@ -52,17 +51,28 @@ BoundaryHandler::BoundaryRetType BoundaryHandler::clean_body(std::string &body, 
     std::string before_boundary;
     bool boundary_found;
     std::string empty_content = "";
+    // std::cout << "from last extra "<< extra << std::endl <<"!!!" << std::endl;
     join_up_receives(body);
-    
+    // std::cout << "body thatll be handled :" << body <<std::endl<< "!!!" <<std::endl;
     if(stage == IN_BODY)
     {
         boundary_found = clean_boundary(body,size,before_boundary);//first before_boundary throw away
     }
+    // std::cout << "after  cleaning :" << before_boundary << std::endl;
+
+    // if(stage == NEED_CONTENT_TYPE)
+    // {
+    //     std::cout << before_boundary << std::endl;
+    //     std::cout << "need content type" << std::endl;
+    // }
+    // std::cout << "after  cleaning boundary :" << body << std::endl<< "!!!" <<std::endl;
+    // std::cout << "__________" << std::endl;
     if(stage == NEED_CONTENT_TYPE)
     { 
         
         //if boundary found//
         std::string contentType = parse_mini_header(body,size);//returns new contentType -> set it in the map
+        
         if(contentType.empty())
         {//need content type next iteration
             insert_raw(res,before_boundary,empty_content);
@@ -111,26 +121,27 @@ bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::strin
         return 0;
     stage = NEED_CONTENT_TYPE;
     //clean body from boundary// store whats before boundary
-    before_boundary = body.substr(0,pos);
+    before_boundary = body.substr(0,pos - 2);//\r\n before boundary
     size_t after_boundary_pos;
-    std::cout << "stint" <<std::endl;
     after_boundary_pos = find_boundary_end(body,pos);
     if(after_boundary_pos == std::string::npos)
     {
         //put error and make it not do shit even recursively if error
+        std::cout << "npos clean boundary" << std::endl;
         done = true;
         return 0;
     }
-    std::cout << "inn\n";
+    std::cout << "start :" << pos << std::endl;
+    std::cout << "before_boundary :" << before_boundary <<"!!"<< std::endl<<"!!!" << std::endl;
+
+    std::cout << "BEFORE cleaned boundary here and in content type:" <<std::endl << body << std::endl;
 
     if(!done)
     {
         body = body.substr(after_boundary_pos, size);
         size = body.size();
-        // put it in the vector?
     }
-    std::cout << "innt\n";
-
+    std::cout << "cleaned boundary here and in content type:" <<std::endl << body << std::endl;
     return 1;
 }
 
@@ -140,14 +151,15 @@ size_t BoundaryHandler::find_boundary_end(std::string &body,size_t start)
     const char *strData = body.data();
     size_t strLength = body.size();
     
-    for (size_t i = 0; i <= strLength - 2; i++)
+    for (; cursor <= strLength - 2; cursor++)
     {
         if(memcmp(strData + cursor, "\r\n", 2) == 0)
-            return i + 2;
-        if(memcmp(strData + cursor, "--", 2) == 0)
+            return cursor + 2;
+        if(cursor - start > 6 && memcmp(strData + cursor, "--", 2) == 0)//to not take firsts ones
         {
+            std::cout << "last boundary found" << std::endl;
             done = true;
-            return i + 2;
+            return cursor + 2;
         }
     }
     return std::string::npos;//meaning boundary was syntax failure
@@ -161,6 +173,7 @@ std::string BoundaryHandler::parse_mini_header(std::string &body, size_t size)
     std::string contentType = get_content_type(body,size,header_end_found);
     if(header_end_found == std::string::npos)
     {
+        std::cout <<"header npos" << std::endl;
         stage = NEED_CONTENT_TYPE;
         return(std::string());
     }
@@ -170,7 +183,9 @@ std::string BoundaryHandler::parse_mini_header(std::string &body, size_t size)
     //if I find contentType
     //update body to point to after(start of body)
     stage = IN_BODY;
+    std::cout << "before  miniheader sb:" << body << std::endl<< "!!!" <<std::endl;
     body = body.substr(header_end_found + 4 ,body.length());
+
     return contentType;
 }
 
@@ -187,7 +202,6 @@ std::string BoundaryHandler::get_content_type(std::string &body, size_t size, si
     header_end_found = pos;
     if(pos == std::string::npos)
         return std::string();
-    header_end_found = true;
     std::string keysDelimeters = ":";
     std::string valuesDelimeters = ";,=:";
     HeaderParser parser(body);

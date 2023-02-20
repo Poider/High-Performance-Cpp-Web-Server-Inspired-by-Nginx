@@ -4,12 +4,12 @@ SRCS = main.cpp HostsManagement.cpp A_Request.cpp GetRequest.cpp PostRequest.cpp
 
 OBJS = ${SRCS:.c=.o}
 
-CC = c++ -fsanitize=address
+CC = c++
 
 RM = rm -f
 
 # CFLAGS = -Wall -Wextra -Werror -std=c++98
-CFLAGS = -std=c++11
+CFLAGS = -std=c++11 -g
 
 all : $(NAME)
 

@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/20 17:21:05 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/21 16:45:26 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ BoundaryHandler::BoundaryHandler()
     initialized = false;
     done = false;
     first_boundary = true;
+    error = false;
 };
 
 //map of what to (write+size) + (content-type)OrEmpty to add on last file opened
@@ -118,7 +119,7 @@ bool BoundaryHandler::clean_boundary(std::string &body, size_t &size, std::strin
     after_boundary_pos = find_boundary_end(body,pos);
     if(after_boundary_pos == std::string::npos)
     {
-        //put error and make it not do shit even recursively if error
+        error = true;
         std::cout << "npos clean boundary" << std::endl;
         done = true;
         return 0;
@@ -156,6 +157,7 @@ size_t BoundaryHandler::find_boundary_end(std::string &body,size_t start)
 }
 
 
+
 std::string BoundaryHandler::parse_mini_header(std::string &body, size_t size)
 {//send body after boundary
     //do I parse also contentDisposition//if so return pair of string and map of keyvalue
@@ -163,7 +165,6 @@ std::string BoundaryHandler::parse_mini_header(std::string &body, size_t size)
     std::string contentType = get_content_type(body,size,header_end_found);
     if(header_end_found == std::string::npos)
     {
-        // std::cout <<"header npos" << std::endl;
         stage = NEED_CONTENT_TYPE;
         return(std::string());
     }
@@ -271,6 +272,10 @@ std::string& BoundaryHandler::get_extra()
     return extra;
 };
 
+bool BoundaryHandler::failed()
+{
+    return error;
+};
 
 void BoundaryHandler::insert_raw(BoundaryRetType& res ,std::string& raw,std::string& contentType)
 {

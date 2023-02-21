@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:48:13 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/17 16:45:32 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/21 16:13:27 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ bool first_boundary;
 bool initialized;
 std::string boundary;
 bool done;
+bool error;
 //vector of pairs of what to write + (content-type)OrEmpty to add on last file opened
 typedef std::vector<std::pair<std::string, std::string> > BoundaryRetType;
 
@@ -62,6 +63,7 @@ void insert_raw(BoundaryRetType& res ,std::string& raw,std::string& contentType)
 void fill_extra(std::string &str, bool Type);//split string, saves extra, returns what to be written
 void join_up_receives(std::string &body);
 std::string& get_extra();
+bool failed();
 private :
 size_t findSubstring(const std::string& str, const std::string& substr);
 

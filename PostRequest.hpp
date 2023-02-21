@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/08 14:37:58 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/20 16:33:21 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/21 16:16:57 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class PostRequest : public  A_Request
 
 		void write_body(std::string& body, size_t size);
 		void write_body(std::vector<const char *>  &chunks, size_t size);
-		void handle_boundary(std::string &body, size_t size, Client &client);
+		bool handle_boundary(std::string &body, size_t size, Client &client);
 
 		~PostRequest();
 };

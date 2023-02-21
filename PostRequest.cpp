@@ -6,7 +6,7 @@
 /*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/20 18:29:03 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/21 16:19:09 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,7 +113,6 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
         if chunk size is 0 meaning its done then  close and flag up its done with body
     */
 
-    //handle this with chunks
     if (content_type == "multipart/form-data")
     {
         if(is_chunked)
@@ -121,12 +120,13 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
             for (int i = 0; i < chunks.size(); i +=2)
             {
                 std::string chunk_body(chunks[i],chunks[i + 1]- chunks[i]);
-                handle_boundary(chunk_body,size,client);
+                if(!handle_boundary(chunk_body,size,client))
+                    return ;
             }
 
         }
-        else
-            handle_boundary(body,size,client);
+        else if(!handle_boundary(body,size,client))
+                return;
 
     }
     else
@@ -175,47 +175,53 @@ void PostRequest::setBodyAsFinished(Client &client)
 	client.set_response_code(CREATED);
 }
 
-void PostRequest::handle_boundary(std::string &body, size_t size, Client &client)
+bool PostRequest::handle_boundary(std::string &body, size_t size, Client &client)
 {
-    if(!boundary_handler.is_initialized())
+    if (!boundary_handler.is_initialized())
+    {
+        auto it = _headers.find("boundary");
+        if (it == _headers.end())
         {
-            auto it = _headers.find("boundary");
-            if (it == _headers.end())
-            {
-                std::cout << "boundary doesnt exist error\n";
-                client.set_response_code(BAD_REQUEST);
-                client.finished_body();
-                return ;
-            }
-            boundary_handler.set_boundary(it->second[0]);
+            std::cout << "boundary doesnt exist error\n";
+            client.set_response_code(BAD_REQUEST);
+            client.finished_body();
+            return 0;
         }
-        BoundaryHandler::BoundaryRetType res = boundary_handler.clean_body(body,body.size());
-        
-        if(res.size() != 0)
+        boundary_handler.set_boundary(it->second[0]);
+    }
+    BoundaryHandler::BoundaryRetType res = boundary_handler.clean_body(body, body.size());
+    if(boundary_handler.failed())
+    {
+        client.set_response_code(BAD_REQUEST);
+        client.finished_body();
+        return 0;
+    }
+    if (res.size() != 0)
+    {
+        for (size_t i = 0; i < res.size(); i++)
         {
-            for(size_t i = 0; i < res.size(); i++)
+            if (res[i].first.empty() && res[i].second.empty())
             {
-                if(res[i].first.empty() && res[i].second.empty())
-                {
-                    std::cout << "contiuin" << std::endl;
-                    continue;
-                }
-                if(!res[i].second.empty())
-                {
-                    if(fs.is_open())
-                        fs.close();
-                    open_file(res[i].second);
-                }
-                if(fs.is_open())
-                {
-                    write_body(res[i].first,res[i].first.size());
-                    // received += res[i].first.size();
-                }   
-                else
-                {
-                    std::cout <<"?"<< res[i].first << "?";
-                    std::cout << "what just happened?" << std::endl;
-                }
+                std::cout << "contiuin" << std::endl;
+                continue;
+            }
+            if (!res[i].second.empty())
+            {
+                if (fs.is_open())
+                    fs.close();
+                open_file(res[i].second);
+            }
+            if (fs.is_open())
+            {
+                write_body(res[i].first, res[i].first.size());
+                // received += res[i].first.size();
+            }
+            else
+            {
+                std::cout << "?" << res[i].first << "?";
+                std::cout << "what just happened?" << std::endl;
             }
         }
+    }
+    return 1;
 }

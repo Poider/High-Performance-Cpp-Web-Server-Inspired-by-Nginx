@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ConfigParser.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/01 12:56:24 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/20 16:27:12 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/23 18:20:47 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -231,6 +231,7 @@ class ConfigParser
 					std::cerr << "Max Body size not Valid" << '\n';
 					exit (FAILURE);
 				}
+				ServerConfigs.size_limit_in();
 				ServerConfigs.setMaxClientBodySize(MaxBodySize);
 			}
 			else if (ConfigName == "error_page")

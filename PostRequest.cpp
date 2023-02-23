@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PostRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/23 16:43:02 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/23 18:33:17 by mel-amma         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,6 +91,10 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
             client.finished_body();
             return ;
         }
+        if(!client.serverConfigs->size_limit_found())
+            size_limit = std::string::npos;
+        else
+            size_limit = client.serverConfigs->getMaxClientBodySize(); 
     }
     
     std::vector<const char *>  chunks;
@@ -147,6 +151,13 @@ void PostRequest::handleRequest(std::string &body, size_t size, Client &client)
 			return ;
         is_chunked? write_body(chunks,size): write_body(body,size) ;
     }
+    if(received > size_limit)
+    {
+        client.set_response_code(REQUEST_ENTITY_TOO_LARGE);
+            client.finished_body();
+        return ;
+    }
+
     if (!is_chunked && (body_length <= received || boundary_handler.is_done()))
     {
         fs.close();
@@ -172,6 +183,7 @@ void PostRequest::write_body(std::vector<const char *>  &chunks, size_t size)
     {
         const char *a =  chunks[i];
         int _size = chunks[i + 1] - chunks[i];
+        received += _size;
         fs.Write_chunk(a,_size);
     }
 };
@@ -179,6 +191,8 @@ void PostRequest::write_body(std::vector<const char *>  &chunks, size_t size)
 
 PostRequest::~PostRequest()
 {
+    if(fs.is_open())
+        fs.close();
 }
 
 void PostRequest::setBodyAsFinished(Client &client, StatusCode responseCode)
@@ -227,7 +241,6 @@ bool PostRequest::handle_boundary(std::string &body, size_t size, Client &client
             if (fs.is_open())
             {
                 write_body(res[i].first, res[i].first.size());
-                // received += res[i].first.size();
             } 
             else
             {

@@ -1,15 +1,16 @@
 NAME = webserv
 
-SRCS = main.cpp HostsManagement.cpp A_Request.cpp GetRequest.cpp PostRequest.cpp  client.cpp BoundaryHandler.cpp 
+SRCS = main.cpp HostsManagement.cpp filemanagement.cpp A_Request.cpp GetRequest.cpp PostRequest.cpp  DeleteRequest.cpp CgiHandler.cpp \
+		client.cpp utils/utils.cpp CGI.cpp BoundaryHandler.cpp 
 
 OBJS = ${SRCS:.c=.o}
 
-CC = c++
+CC = c++ -fsanitize=address
 
 RM = rm -f
 
 # CFLAGS = -Wall -Wextra -Werror -std=c++98
-CFLAGS = -std=c++11 -g
+CFLAGS = -std=c++11
 
 all : $(NAME)
 

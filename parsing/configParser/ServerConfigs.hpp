@@ -6,7 +6,7 @@
 /*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 15:17:55 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/15 17:40:00 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/23 14:26:49 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 
 
 #include "Location.hpp"
-#include "../../static/StaticErrorPages.hpp"
+#include "../../static/StaticResponsePages.hpp"
 
 class ServerConfigs
 {
@@ -33,7 +33,7 @@ class ServerConfigs
 			_locations = std::vector <Location>();
 			_locations.push_back(getDefaultLocation());
 			setDefaultErrorPages();
-			_serv = "80";
+			_serv = "8080";
 		};
 
 		std::vector <std::string> getDefaultAllowedMethods()
@@ -48,8 +48,9 @@ class ServerConfigs
 
 		void setDefaultErrorPages()
 		{
-			_errorPages = StaticErrorPages::ERROR_PAGES;
+			_errorPages = StaticResponsePages::RESPONSE_PAGES;
 		}
+		
 		Location getDefaultLocation()
 		{
 			Location defaultLocation = Location();
@@ -88,12 +89,12 @@ class ServerConfigs
 			return (_serverName);
 		}
 
-		std::map<int , std::string> &AllgetErrorPages()
+		std::map<int , std::string> &AllgetResponsePages()
 		{
 			return (_errorPages);
 		}
 
-		std::string &getErrorPage(int errorCode)
+		std::string &getResponsePage(int errorCode)
 		{
 			// for (auto xs : _errorPages)
 			// 	std::cout << xs.first << " " << xs.second << std::endl;
@@ -136,9 +137,10 @@ class ServerConfigs
 			getnameinfo(peer_address->ai_addr, peer_address->ai_addrlen,
 					buffHost, sizeof(buffHost),
 					buffServ, sizeof(buffServ),
-					NI_NUMERICHOST);
+					NI_NUMERICHOST | NI_NUMERICSERV);
 			_host = buffHost;
 			_serv = buffServ;
+			std::cout << "host = " << _host  << " serv = " << _serv << std::endl;
 		}
 
 		void setServerName(std::string serverName)

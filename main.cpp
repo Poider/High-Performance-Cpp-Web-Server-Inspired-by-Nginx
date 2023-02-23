@@ -3,19 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 16:34:04 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/20 18:11:22 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/23 14:12:03 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "webserv.hpp"
 
+std::map<std::string, ServerMap > servers;
+
 std::vector<std::map <std::string, int > > StaticConfig::SERVER_CONFIGS = StaticConfig::MakeServerConfigVector();
 
-std::map < int  , std::string> StaticErrorPages::ERROR_PAGES = StaticErrorPages::S_InitErrorPages();
+std::map < int  , std::string> StaticResponsePages::RESPONSE_PAGES = StaticResponsePages::S_InitResponsePages();
 
 
 std::map <std::string, std::string > ContentTypes::S_CONTENT_TYPES_MAPPING =  ContentTypes::S_setContentTypesMapping();
@@ -27,6 +29,14 @@ std::map <std::string, bool> SupportedMethods::SUPPORTED_METHODS =  SupportedMet
 
 std::map < int  , std::string> StaticResponseMessages::MAPPING_RESPONSE_CODE_TO_MESSAGES = StaticResponseMessages::S_initResponseMessages();
 
+
+void handler(int sig){
+	if (sig == SIGINT){
+		printf("Closing Server.\n");
+		closeHosts(servers);
+		exit(0);
+	}
+}
 
 std::string readFile(std::string file)
 {
@@ -57,11 +67,11 @@ int main(int ac , char **av)
 		std::cerr << "number argument Not valid !" << std::endl;
 		return (0);
 	}
+	signal(SIGINT, handler);
 	std::ifstream myfile (av[1]);
 	ConfigParser parser = ConfigParser(readFile(av[1]));
 	
 	//map<host+ip , <map <server name,server>>>
-	std::map<std::string, ServerMap > servers;
 	SOCKET maxSocketSoFar = -1;
 	fd_set reads , writes, readyReads, readyWrites;
 
@@ -101,7 +111,7 @@ int main(int ac , char **av)
 					int sizeClient = clients.getNumberClient();
 					if (FD_ISSET(clients[i].socket, &readyReads))
 						http.getRequest(i,xs.second);
-					if (i >= 0 && FD_ISSET(clients[i].socket, &readyWrites) && clients[i].body_is_done())
+					if (i >= 0 && i < clients.getNumberClient() && FD_ISSET(clients[i].socket, &readyWrites) && clients[i].body_is_done())
 					{
 						http.sendResponse(i);
 					}

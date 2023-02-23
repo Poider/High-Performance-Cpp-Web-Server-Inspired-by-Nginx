@@ -6,7 +6,7 @@
 /*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 14:53:29 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/15 17:11:56 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/21 15:40:59 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,26 +28,86 @@ std::string &A_Request::getMethod()
 	return (_method);
 }
 
-void A_Request::parseRequestHeader(std::string &request)
+std::string &A_Request::getQuery()
+{
+	return (_query);
+}
+
+
+bool A_Request::isErrorOccured() const
+{
+	return (_isErrorOccurs);
+}
+
+
+std::string A_Request::getHeaderCgiValue(std::string header)
+{
+	std::string value;
+	auto it = _headersForCgi.find(header);
+	if (it != _headersForCgi.end())
+		value = it ->second;
+	return (value);
+}
+
+
+
+
+void A_Request::setHeadersForCgi(std::string &request)
 {
 	std::string keysDelimeters = ":";
-	std::string valuesDelimeters = ";,=:";
-	//std::cout << request << std::endl;
 	HeaderParser parser(request);
-	//std::cout << "request == " << request << std::endl;
-	_method = parser.getNextToken(keysDelimeters);
-	_path = parser.getNextToken(keysDelimeters);
-	_httpVersion =  parser.getNextToken(keysDelimeters);
-	// std::cout << "method = " << _method << std::endl;
-	// std::cout << "_path = " << _path << std::endl;
-	// std::cout << "httpVersion = " << _httpVersion << std::endl;
-
+	parser.getHeaderValue();
+	
 	while (!parser.isDoneParsing())
 	{
 		std::string requestHeader = parser.getNextToken(keysDelimeters);
 		if (!requestHeader.empty())
 		{
-			std::vector < std::string >  values = parser.getValuesCurrToken(valuesDelimeters);
+			std::string  value = parser.getHeaderValue();
+			_headersForCgi["http_" + requestHeader] = value;
+		}
+	}
+
+	// for (auto xs : _headersForCgi)
+	// {
+	// 	std::cout << xs.first << " : " << xs.second << std::endl;
+	// }
+
+}
+
+void  A_Request::parsePath(HeaderParser &parser)
+{
+	HeaderPath headerPath;
+	std::string keysDelimeters = ":";
+	std::string path = parser.getNextToken(keysDelimeters);
+	if (headerPath.parse(path))
+	{
+		_path = headerPath.getPath();
+		_query = headerPath.getParams();
+	}
+	else
+		_isErrorOccurs = true;
+
+	
+}
+
+void A_Request::setHeadersRequest(std::string &request)
+{
+	std::string keysDelimeters = ":";
+	std::string valuesDelimeters = ";,=:";
+	std::cout << request << std::endl;
+	HeaderParser parser(request);
+	_method = parser.getNextToken(keysDelimeters);
+	
+	parsePath(parser);
+	//std::cout << "path = " << _path << " query = " << _query << std::endl;
+	_httpVersion =  parser.getNextToken(keysDelimeters);
+	while (!parser.isDoneParsing())
+	{
+		std::string requestHeader = parser.getNextToken(keysDelimeters);
+		if (!requestHeader.empty())
+		{
+			std::vector < std::string >  values = parser.getValuesCurrToken(valuesDelimeters, _isErrorOccurs);
 			_headers[requestHeader] = values;
 			if (requestHeader == "Content-Type")
 			{
@@ -64,14 +124,12 @@ void A_Request::parseRequestHeader(std::string &request)
 			}
 		}
 	}
-	// for (auto xs : _headers)
-	// {
-	// 	std::cout << "values : " << xs.first << " ";
-	// 	for (int i = 0; i < xs.second.size(); i++)
-	// 		std::cout << xs.second[i] << " ";
-	// 	std::cout << std::endl;
-	// }
-	// exit(2);
+}
+
+void A_Request::parseRequestHeader(std::string &request)
+{
+	setHeadersRequest(request);
+	setHeadersForCgi(request);
 }
 
 std::string &A_Request::getHttpVersion()
@@ -108,6 +166,11 @@ bool A_Request::isRequestWellFormed(Client &client)
 		client.set_response_code(BAD_REQUEST);
 		return (false);
 	}
+	if (!client.bestLocationMatched->isMethodAllowed(client.requestHandler->getMethod()))
+	{
+		client.set_response_code(METHOD_NOT_ALLOWED);
+		return (false);
+	}
 	if (_path.length() > MAX_URI_SIZE)
 	{
 		client.set_response_code(REQUEST_URI_TOO_LONG);
@@ -121,4 +184,42 @@ bool A_Request::isRequestWellFormed(Client &client)
 
 	isWellFormed = true;
 	return (isWellFormed);
+}
+
+//aaa/a..
+
+bool A_Request::isValidPath()
+{
+	std::stringstream stream(_path + "/");
+	std::string token;
+	while (std::getline(stream, token, '/')){
+		if (token == ".." || token == "."){
+			return (false);
+		}
+	}
+	return (true);
+}
+
+
+
+std::string A_Request::getPathRessource(Location &bestLocationMatched)
+{
+	std::string currPath = bestLocationMatched.getRoot();
+	if (currPath[currPath.length() - 1] != '/')
+		currPath += "/";
+	currPath += _path.substr(bestLocationMatched.getRoute().length(), _path.length());
+	return (currPath); 
+}
+
+
+void A_Request::addHeaderToCgi(const std::string headerKey, const std::string headerValue)
+{
+	_headersForCgi[headerKey] = headerValue;
+}
+
+
+void A_Request::setBodyAsFinished(Client &client)
+{
+	client.finished_body();
+	client.set_response_code(CREATED);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   BoundaryHandler.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/15 15:44:45 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/21 16:45:26 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/23 15:26:55 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ std::string BoundaryHandler::get_content_type(std::string &body, size_t size, si
         return std::string();
     std::string keysDelimeters = ":";
     std::string valuesDelimeters = ";,=:";
-    HeaderParser parser(body);
+    HeaderParser parser(body.substr(0, header_end_found));
     std::string contentType;
 
     std::map<std::string , std::vector < std::string > >	_headers;
@@ -202,7 +202,8 @@ std::string BoundaryHandler::get_content_type(std::string &body, size_t size, si
         std::string requestHeader = parser.getNextToken(keysDelimeters);
         if (!requestHeader.empty())
         {
-            std::vector<std::string> values = parser.getValuesCurrToken(valuesDelimeters);
+			bool isErrorOccured = false;
+            std::vector<std::string> values = parser.getValuesCurrToken(valuesDelimeters, isErrorOccured);
             _headers[requestHeader] = values;
             if (requestHeader == "Content-Type")
                 contentType = values[0];

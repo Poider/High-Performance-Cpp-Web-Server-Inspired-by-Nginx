@@ -6,7 +6,7 @@
 /*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/03 13:04:37 by klaarous          #+#    #+#             */
-/*   Updated: 2023/02/11 12:29:28 by klaarous         ###   ########.fr       */
+/*   Updated: 2023/02/20 16:42:48 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 
 #include "../../includes.hpp"
 #include "../../static/SupportedMethods.hpp"
+
+#define DEFAULT_UPLOAD_PASS "./public/uploads"
 
 #define  Extention std::string
 
@@ -29,11 +31,12 @@ class Location
 		std::string 										_root;
 		std::vector <std::string> 							_indexes;
 		std::string 										_uploadPass;
-		std::vector < std::pair <Extention, std::string > > _cgis;
+		std::map < Extention, std::string  > 				_cgis;
 	public :
 		Location()
 		{
 			_autoIndex = false;
+			setDefaultUploadPass();
 		}
 		
 		std::string &getRoute()
@@ -70,7 +73,7 @@ class Location
 			return (_uploadPass);
 		}
 
-		std::vector < std::pair <Extention, std::string > >  &getCgis()
+		std::map < Extention, std::string  >   &getCgis()
 		{
 			return (_cgis);
 		}
@@ -121,7 +124,12 @@ class Location
 			_uploadPass = uploadPass;
 		}
 
-		void setCgis(std::vector < std::pair <Extention, std::string > > cgis)
+		void setDefaultUploadPass()
+		{
+			_uploadPass = DEFAULT_UPLOAD_PASS;
+		}
+
+		void setCgis(std::map < Extention, std::string  >  &cgis)
 		{
 			_cgis = cgis;
 		}
@@ -131,9 +139,9 @@ class Location
 			return  (!(_route.empty() || _root.empty() || _indexes.empty()));
 		}
 
-		void addcgi(Extention lang, std::string path)
+		void addcgi(Extention &lang, std::string &path)
 		{
-			_cgis.push_back(std::make_pair(lang, path));	
+			_cgis[lang] = path;
 		}
 
 
@@ -144,11 +152,19 @@ class Location
 
 		bool isRouteMatch(std::string &path)
 		{
-			if (path.rfind(_route, 0) == 0 && (path.length() == _route.length() || ((path.length() > _route.length() && ( _route[_route.length() - 1] == '/' ||   path[_route.length() + 1] == '/')))))
+			if (path.rfind(_route, 0) == 0 && (path.length() == _route.length() || ((path.length() > _route.length() && ( _route[_route.length() - 1] == '/' ||   path[_route.length()] == '/')))))
 				return (true);
 			return (false);
 		}
-		
+
+		std::string getPathCgi(Extention &extention)
+		{
+			std::string pathCgi;
+			auto it = _cgis.find(extention);
+			if (it != _cgis.end())
+				pathCgi = it ->second;
+			return (pathCgi);
+		}
 };
 
 #endif

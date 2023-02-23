@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   PostRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-amma <mel-amma@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klaarous <klaarous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/12 17:48:36 by mel-amma          #+#    #+#             */
-/*   Updated: 2023/02/21 16:19:09 by mel-amma         ###   ########.fr       */
+/*   Updated: 2023/02/23 15:10:24 by klaarous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ bool PostRequest::handle_boundary(std::string &body, size_t size, Client &client
             {
                 write_body(res[i].first, res[i].first.size());
                 // received += res[i].first.size();
-            }
+            } 
             else
             {
                 std::cout << "?" << res[i].first << "?";

@@ -19,7 +19,10 @@ struct Http{
             _writes(writes), _clients(clients), _server(server)
     {};
 
-    void getRequest(int Client_Number, ServerMap& SameSocketServers)
+
+
+
+    void getRequest(int Client_Number, ServerMap& Servers)
     {
 		// std::cout <<"getRequest\n";
 		Client &client = _clients[Client_Number];
@@ -52,37 +55,50 @@ struct Http{
 				client.factoryRequestHandlerSetter();
 			// parse request
 			client.requestHandler->parseRequestHeader(header);
-			// set server config
-			// loop through servers and add server configs of the matched one from the request in the client
-			ServerConfigs *requestConfigs;
-			{
-				A_Request::headersType headers = client.requestHandler->getHeaders();
-				std::string host = headers.at("Host")[0];
 
-				requestConfigs = &((SameSocketServers.begin())->second.getServerConfigs());
-				for (auto &serv : SameSocketServers)
+			if (client.requestHandler->isErrorOccured())
+			{
+				client.set_response_code(BAD_REQUEST);
+				client.finished_body();
+			}
+			else //parsing done successfuly)
+			{
+				std::string &path = client.requestHandler->getPath();
+				if (!client.requestHandler->isValidPath())
 				{
-					if (host == serv.first)
-					{
-						requestConfigs = &(serv.second.getServerConfigs());
-						break ;
-					}
+					client.set_response_code(BAD_REQUEST);
+					client.finished_body();
+				}
+				else // set server config
+				{
+					client.setServerConfigs(Servers);
+					client.path = path;
+					client.setBestLocationMatched();
+					client.requestHeaderDone = true;
+					if (client.requestHandler->isRequestWellFormed(client) == false)
+						client.finished_body();	
 				}
 			}
-			client.set_request_configs(requestConfigs);
-			std::string &path = client.requestHandler->getPath();
-			client.path = new char[path.length() + 1];
-			strcpy(client.path, path.c_str());
-			client.setBestLocationMatched();
-			client.requestHeaderDone = true;
-			if (client.requestHandler->isRequestWellFormed(client) == false)
+			client.setPathRessource();// Setting path ressource
+			if (client.sendError == false)
 			{
-				client.finished_body();
-				return ;
+				if (client.isRequestForCgi())
+				{
+					client.setupHeadersForCgi(client.cgiPath);
+					client.requestHandler->printCgisHeaders();
+				}
 			}
-		
 		}
-		if (client.sendError == false && client.requestHandler)
+		// cgi for get request  i don't know if i should add indexes 
+		if (client.sendError)
+		{
+			client.finished_body();
+		}
+		else if (client.isForCgi)
+		{
+			
+		}
+		else if (client.requestHandler)	//handle request
 		{
 			client.requestHandler->handleRequest(body, sz, client);
 			if(client.body_is_done())
@@ -96,7 +112,7 @@ struct Http{
     {
 		Client &client = _clients[Client_Number];
 		bool isHeaderSendSuccefuly = true;
-        if (client.fp == nullptr)
+        if (client.isHeaderSend == false)
 		{
             isHeaderSendSuccefuly = _server.sendHeaderResponse(client, _reads, _writes, Client_Number);
 		}
